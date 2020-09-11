@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronometro</title>
+    <style type="text/css">
+        * {
+            width: 320px;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            padding-left: 800px;
+            margin-top: 200px;
+            justify-content: center;
+            height: 40vh;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #relogio {
+            border: 2px solid black;
+            font-size: 300%;
+            width: 600px;
+            margin-right: auto;
+            margin-left: -50px;
+            height: 30vh;
+            padding-left: 130px;
+            padding-top: 50px;
+            border-radius: 12px;
+            background-color: blue;
+            overflow-y: visible;
+            overflow-x: hidden;
+            display: flex;
+            margin-left: -200px;
+        }
+
+        a {
+            text-decoration: none;
+            border: 2px solid black;
+            border-radius: 12px;
+            padding: 5px;
+            margin-right: 1.51px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            width: 40vw;
+            font-family: fantasy;
+            background-color: yellow;
+        }
+
+        .controls {
+            padding-left: 7.4px;
+        }
+
+        #numblap {
+            margin-left: -100px;
+        }
+
+        .Stopwatch {
+            margin-left: 920px;
+            transform: translateY(250px);
+            font-size: 200%;
+        }
+
+        #fem {
+            margin-top: -100px;
+            transform: translateY(-120px);
+        }
+
+        #r{
+            margin-left: -100px;
+            display: inline-block;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="Stopwatch"></div>
+
+    <main>
+
+        <div id="relogio">
+            <table id="r">
+                <tr>
+                <th id="resultado">Lap |</b>
+                <th id="time1">Tempo</b>
+                </tr>
+                <th id="numblap"></th>
+            
+                <th class="results" id="rrr"></th>
+        </table>
+        </div>
+        <div>
+            <nav class="controls">
+                <a href="#" class="button" onclick="Stopwatch.start()">Começar</a>
+                <a href="#" class="button" onclick="Stopwatch.stop()">Parar</a>
+                <a href="#" class="button" id="lapbtn" onclick="Stopwatch.lap(), mudar()">Lap</a>
+                <a href="#" class="button" onclick="Stopwatch.restart()">Recomeçar</a>
+                <a href="#" class="button" onclick="window.location.reload()">Zerar</a>
+            </nav>
+        </div>
+    </main>
+    <footer></footer>
+
+    <script>
+        var cont = 0
+
+        function mudar() {
+            cont++
+            var lapp = document.createElement('p');
+            lapp.innerHTML = cont;
+            document.getElementById("numblap").append(lapp)
+        }
+    </script>
+
+    <script>
+        var _createClass = function () {
+            function defineProperties(target, props) {
+                for (var i = 0; i < props.length; i++) {
+                    var descriptor = props[i];
+                    descriptor.enumerable = descriptor.enumerable || false;
+                    descriptor.configurable = true;
+                    if ("value" in descriptor)
+                        descriptor.writable = true;
+                    Object.defineProperty(target, descriptor.key, descriptor);
+                }
+            }
+            return function (Constructor, protoProps, staticProps) {
+                if (protoProps)
+                    defineProperties(Constructor.prototype, protoProps);
+                if (staticProps)
+                    defineProperties(Constructor, staticProps);
+                return Constructor;
+            };
+        }();
+
+        function _classCallCheck(instance, Constructor) {
+            if (!(instance instanceof Constructor)) {
+                throw new TypeError("Não se pode chamar uma classe como função...");
+            }
+        }
+
+        var Stopwatch = function () {
+            function Stopwatch(display, results) {
+                _classCallCheck(this, Stopwatch);
+
+                this.running = false;
+                this.display = display;
+                this.results = results;
+                this.laps = [];
+                this.reset();
+                this.print(this.times);
+            }
+            _createClass(Stopwatch, [{
+                key: 'reset',
+                value: function reset() {
+                    this.times = [0, 0, 0];
+                }
+            }, {
+                key: 'start',
+                value: function start() {
+                    if (!this.time)
+                        this.time = performance.now();
+                    if (!this.running) {
+                        this.running = true;
+                        requestAnimationFrame(this.step.bind(this));
+                    }
+                }
+            }, {
+                key: 'lap',
+                value: function lap() {
+                    var times = this.times;
+                    var li = document.createElement('p');
+                    li.innerText = this.format(times)
+                    this.results.append(li);
+                }
+            }, {
+                key: 'stop',
+                value: function stop() {
+                    this.running = false;
+                    this.time = null;
+                }
+            }, {
+                key: 'restart',
+                value: function restart() {
+                    if (!this.time)
+                        this.time = performance.now();
+                    if (!this.running) {
+                        this.running = true;
+                        requestAnimationFrame(this.step.bind(this));
+                    }
+                    this.reset();
+                }
+            }, {
+                key: 'clear',
+                value: function clear() {
+                    clearChildren(this.results);
+                }
+            }, {
+                key: 'step',
+                value: function step(timestamp) {
+                    if (!this.running) return;
+                    this.calculate(timestamp);
+                    this.time = timestamp;
+                    this.print();
+                    requestAnimationFrame(this.step.bind(this));
+                }
+            }, {
+                key: 'calculate',
+                value: function calculate(timestamp) {
+                    var diff = timestamp - this.time;
+                    this.times[2] += diff / 10;
+                    if (this.times[2] >= 100) {
+                        this.times[1] += 1;
+                        this.times[2] -= 100;
+                    }
+                    if (this.times[1] >= 60) {
+                        this.times[0] += 1;
+                        this.times[1] -= 60;
+                    }
+                }
+            }, {
+                key: 'print',
+                value: function print() {
+                    this.display.innerText = this.format(this.times);
+                }
+            }, {
+                key: 'format',
+                value: function format(times) {
+                    return pad0(times[0], 2) + ':' + pad0(times[1], 2) + ':' + pad0(Math.floor(
+                        times[2]), 2);
+                }
+            }]);
+            return Stopwatch;
+        }();
+
+        function pad0(value, count) {
+            var result = value.toString();
+            for (; result.length < count; --count) {
+                result = '0' + result;
+            }
+
+            return result;
+        }
+
+        function clearChildren(node) {
+            while (node.lastChild) {
+                node.removeChild(node.lastChild);
+            }
+        }
+        var Stopwatch = new Stopwatch(document.querySelector('.Stopwatch'),
+            document.querySelector('.results'));
+    </script>
+</body>
+
+</html>
